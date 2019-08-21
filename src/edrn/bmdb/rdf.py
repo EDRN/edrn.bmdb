@@ -68,7 +68,7 @@ def _biomarkers(connection, graph, public):
             if isPrimary: bmName = name
             if isHgnc: hgncName = name
             graph.add((subject, _bmdb.Alias, name))
-        if hgncName is None: hgncName = rdflib.Literal(u'')  # Better to just leave out the predicate; but bmdb is crap
+        if hgncName is None: hgncName = rdflib.Literal(u'')  # Better to just leave out the predicate; but bmdb is "awesome"
 
         graph.add((subject, _bmdb.Title, rdflib.Literal(bmName)))
         graph.add((subject, _bmdb.HgncName, rdflib.Literal(hgncName)))
