@@ -1,0 +1,4 @@
+graft src/edrnsite
+graft docs
+include *.rst
+global-exclude *.pyc
