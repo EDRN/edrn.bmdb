@@ -47,14 +47,15 @@ def _biomarkers(connection, graph, public):
     for dbid, name, shortName, desc, qaState, phase, security, btype, isPanel, panelID, curatorNotes in biocursor.fetchall():
         isPublicBiomaker = qaState == u'Accepted'
 
-        subject  = rdflib.URIRef(u'{}biomarkers/view/{}'.format(_biomarkerBase, dbid))
-        urn      = rdflib.Literal(u'urn:edrn:bmdb:biomarker:{}'.format(dbid))
-        desc     = rdflib.Literal(desc.strip())
-        qaState  = rdflib.Literal(qaState)
-        phase    = rdflib.Literal(phase)
-        security = rdflib.Literal(security)
-        btype    = rdflib.Literal(btype)
-        isPanel  = bool(isPanel)
+        subject   = rdflib.URIRef(u'{}biomarkers/view/{}'.format(_biomarkerBase, dbid))
+        urn       = rdflib.Literal(u'urn:edrn:bmdb:biomarker:{}'.format(dbid))
+        desc      = rdflib.Literal(desc.strip())
+        qaState   = rdflib.Literal(qaState)
+        phase     = rdflib.Literal(phase)
+        security  = rdflib.Literal(security)
+        btype     = rdflib.Literal(btype)
+        shortName = rdflib.Literal(shortName.strip())
+        isPanel   = bool(isPanel)
 
         # OK, let's go
         graph.add((subject, _type, bioType))
@@ -78,6 +79,7 @@ def _biomarkers(connection, graph, public):
         graph.add((subject, _bmdb.Phase, phase))
         graph.add((subject, _bmdb.Security, security))
         graph.add((subject, _bmdb.Type, btype))
+        graph.add((subject, _bmdb.ShortName, shortName))
 
         # If it's a panel, show its composition
         if isPanel:
@@ -123,7 +125,7 @@ def _biomarkers(connection, graph, public):
             # Organs; note the portal doesn't even use this; does anyone?
             cursor.execute(u'SELECT id FROM organ_datas WHERE biomarker_id = %s', (dbid,))
             for i in cursor.fetchall():
-                organURI = rdflib.URIRef(u'{}biomarkers/view/{}'.format(_biomarkerBase, i[0]))
+                organURI = rdflib.URIRef(u'{}biomarkers/organs/{}'.format(_biomarkerBase, i[0]))
                 graph.add((subject, _bmdb.indicatorForOrgan, organURI))
 
             # Studies
