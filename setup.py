@@ -40,6 +40,9 @@ setup(
         'MySQL-python',  # Requires Python 2.7
     ],
     entry_points={
-        'console_scripts': 'generate-bmdb-rdf=edrn.bmdb.rdf:main'
+        'console_scripts': [
+            'generate-bmdb-rdf=edrn.bmdb.rdf:main',
+            'fix-genenames-links=edrn.bmdb.genenames:main'
+        ],
     },
 )
