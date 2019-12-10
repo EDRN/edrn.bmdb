@@ -31,7 +31,11 @@ def _publications(connection, graph, public):
     cursor = connection.cursor()
     cursor.execute(u'SELECT id, pubmed_id FROM publications')
     for subject, pmid in cursor.fetchall():
-        subject, pmid = rdflib.URIRef(_edrnSubjectBase + u'pubs/' + unicode(subject)), rdflib.Literal(unicode(pmid))
+        # Special exception: pubs don't match the rest of EDRN.
+        # CancerDataExpo uses: "http://edrn.jpl.nasa.gov/data/pubs/#"
+        # BMDB uses "http://edrn.jpl.nasa.gov/bmdb/publications/view/#"
+        subject = rdflib.URIRef(u'http://edrn.jpl.nasa.gov/bmdb/publications/view/' + unicode(subject))
+        pmid    = rdflib.Literal(unicode(pmid))
         graph.add((subject, _type, rdfType))
         graph.add((subject, _edrnSchema.pmid, pmid))
 
