@@ -109,7 +109,7 @@ def _biomarkers(connection, graph, public):
         # Datasets
         cursor.execute(u'SELECT dataset_id FROM biomarker_datasets WHERE biomarker_id = %s', (dbid,))
         for i in cursor.fetchall():
-            datasetURI = rdflib.URIRef(u'https://edrn.jpl.nasa.gov/ecas/data/dataset/urn:edrn:{}'.format(i[0]))
+            datasetURI = rdflib.URIRef(u'https://edrn-labcas.jpl.nasa.gov/ui/c/{}'.format(i[0]))
             graph.add((subject, _bmdb.AssociatedDataset, datasetURI))
 
         # Publications
