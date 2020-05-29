@@ -42,7 +42,8 @@ setup(
     entry_points={
         'console_scripts': [
             'generate-bmdb-rdf=edrn.bmdb.rdf:main',
-            'fix-genenames-links=edrn.bmdb.genenames:main'
+            'fix-genenames-links=edrn.bmdb.genenames:main',
+            'query-into-csv=edrn.bmdb.query:main'
         ],
     },
 )
