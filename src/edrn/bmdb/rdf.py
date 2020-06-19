@@ -127,7 +127,7 @@ def _biomarkers(connection, graph, public):
         # too, then include organ details as well.
         if isPublicBiomaker or not public:
             # Organs; note the portal doesn't even use this; does anyone?
-            cursor.execute(u'SELECT id FROM organ_datas WHERE biomarker_id = %s', (dbid,))
+            cursor.execute(u'SELECT id FROM organ_data WHERE biomarker_id = %s', (dbid,))
             for i in cursor.fetchall():
                 organURI = rdflib.URIRef(u'{}biomarkers/organs/{}'.format(_biomarkerBase, i[0]))
                 graph.add((subject, _bmdb.indicatorForOrgan, organURI))
@@ -155,9 +155,9 @@ def _organs(connection, graph, public):
     bmoType, bmoStudyDataType = rdflib.URIRef(_bmdb.BiomarkerOrganData), rdflib.URIRef(_bmdb.BiomarkerOrganStudyData)
     bmoCursor = connection.cursor()
     bmoCursor.execute(
-        u'SELECT biomarker_id, organ_datas.id, description, performance_comment, organs.name, phase, qastate,'
+        u'SELECT biomarker_id, organ_data.id, description, performance_comment, organs.name, phase, qastate,'
         u' clinical_translation'
-        u' from organ_datas, organs WHERE organ_datas.organ_id = organs.id'
+        u' from organ_data, organs WHERE organ_data.organ_id = organs.id'
     )
     for bmID, bmoID, desc, perfCom, organName, phase, qastate, clinTran in bmoCursor.fetchall():
         bmoSubject = rdflib.URIRef(u'{}biomarkers/organs/{}/{}'.format(_biomarkerBase, bmID, bmoID))
@@ -235,7 +235,7 @@ def _organs(connection, graph, public):
                     graph.add((bosdURI, _bmdb.referencesResource, rdflib.URIRef(i[0].strip())))
 
         # Publications
-        cursor.execute(u'SELECT publication_id FROM organ_datas_publications WHERE organ_data_id = %s', (bmoID,))
+        cursor.execute(u'SELECT publication_id FROM organ_data_publications WHERE organ_data_id = %s', (bmoID,))
         for i in cursor.fetchall():
             pubURI = rdflib.URIRef(u'{}publications/view/{}'.format(_biomarkerBase, i[0]))
             graph.add((bmoSubject, _bmdb.referencedInPublication, pubURI))
