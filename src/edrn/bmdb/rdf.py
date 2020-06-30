@@ -134,9 +134,9 @@ def _biomarkers(connection, graph, public):
 
             # Studies
             cursor.execute(
-                u'SELECT biomarker_study_datas.id, studies.FHCRC_ID FROM biomarker_study_datas JOIN studies'
-                u' ON biomarker_study_datas.study_id = studies.id'
-                u' WHERE biomarker_study_datas.biomarker_id = %s',
+                u'SELECT biomarker_study_data.id, studies.FHCRC_ID FROM biomarker_study_data JOIN studies'
+                u' ON biomarker_study_data.study_id = studies.id'
+                u' WHERE biomarker_study_data.biomarker_id = %s',
                 (dbid,)
             )
             if cursor.rowcount > 0:
@@ -192,8 +192,8 @@ def _organs(connection, graph, public):
 
         # Study data; and save them up for later use
         cursor.execute(
-            u'SELECT study_datas.id, studies.FHCRC_ID, study_datas.decision_rule FROM study_datas, studies'
-            u' WHERE studies.id = study_datas.study_id AND study_datas.organ_data_id = %s', (bmoID,)
+            u'SELECT study_data.id, studies.FHCRC_ID, study_data.decision_rule FROM study_data, studies'
+            u' WHERE studies.id = study_data.study_id AND study_data.organ_data_id = %s', (bmoID,)
         )
         if cursor.rowcount > 0:
             bag = rdflib.BNode()
@@ -222,7 +222,7 @@ def _organs(connection, graph, public):
 
                 # Publications for this relationship
                 c.execute(
-                    u'SELECT publication_id FROM biomarker_study_datas_publications'
+                    u'SELECT publication_id FROM biomarker_study_data_publications'
                     u' WHERE biomarker_study_data_id = %s', (studyID,)
                 )
                 for i in c.fetchall():
