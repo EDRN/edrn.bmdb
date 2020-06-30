@@ -1,4 +1,5 @@
 .coverage
+*.rdf
 *.egg-info
 *.log
 *.mo
