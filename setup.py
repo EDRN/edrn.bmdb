@@ -37,7 +37,7 @@ setup(
     install_requires=[
         'setuptools',
         'rdflib',
-        'MySQL-python',  # Requires Python 2.7
+        'pymysql',
     ],
     entry_points={
         'console_scripts': [

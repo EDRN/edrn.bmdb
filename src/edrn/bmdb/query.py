@@ -2,48 +2,19 @@
 #
 # Do generic query of some sort
 
-import MySQLdb, argparse, getpass, sys, logging, csv, cStringIO, codecs
+import pymysql, argparse, getpass, sys, logging, csv, codecs
 
 
-_argParser = argparse.ArgumentParser(description=u'Fix genenames.org links in the biomarker database')
-_argParser.add_argument('-H', '--host', default=u'localhost', help=u'MySQL host; default %(default)s')
-_argParser.add_argument('-D', '--database', default=u'cbmdb', help=u'MySQL database, default %(default)s')
-_argParser.add_argument('-u', '--user', default=u'cbmdb', help=u'MySQL user; default %(default)s')
-_argParser.add_argument('-p', '--password', help=u'MySQL password; will be prompted if not given')
-
-
-class UnicodeWriter:
-    """
-    A CSV writer which will write rows to CSV file "f",
-    which is encoded in the given encoding.
-    """
-
-    def __init__(self, f, dialect=csv.excel, encoding="utf-8", **kwds):
-        # Redirect output to a queue
-        self.queue = cStringIO.StringIO()
-        self.writer = csv.writer(self.queue, dialect=dialect, **kwds)
-        self.stream = f
-        self.encoder = codecs.getincrementalencoder(encoding)()
-
-    def writerow(self, row):
-        self.writer.writerow([s.encode("utf-8") for s in row])
-        # Fetch UTF-8 output from the queue ...
-        data = self.queue.getvalue()
-        data = data.decode("utf-8")
-        # ... and reencode it into the target encoding
-        data = self.encoder.encode(data)
-        # write to the target stream
-        self.stream.write(data)
-        # empty queue
-        self.queue.truncate(0)
-
-    def writerows(self, rows):
-        for row in rows:
-            self.writerow(row)
+_argParser = argparse.ArgumentParser(description='Fix genenames.org links in the biomarker database')
+_argParser.add_argument('-H', '--host', default='localhost', help='MySQL host; default %(default)s')
+_argParser.add_argument('-D', '--database', default='cbmdb', help='MySQL database, default %(default)s')
+_argParser.add_argument('-u', '--user', default='cbmdb', help='MySQL user; default %(default)s')
+_argParser.add_argument('-p', '--password', help='MySQL password; will be prompted if not given')
 
 
 def query(connection):
     cursor = connection.cursor()
+    cursor.execute("SET CHARACTER_SET_RESULTS='latin1'")
     cursor.execute('''
         SELECT
             biomarkers.id,
@@ -68,8 +39,8 @@ def query(connection):
             organs.name,
             studies.title
     ''')
-    with open('results.csv', 'wb') as f:
-        writer = UnicodeWriter(f)
+    with open('results.csv', 'w', newline='', encoding='utf-8') as f:
+        writer = csv.writer(f)
         writer.writerow([
             'biomarkers.id',
             'biomarkers.name',
@@ -81,37 +52,39 @@ def query(connection):
             'studies.title'
         ])
         for row in cursor.fetchall():
-            writer.writerow([unicode(i) for i in row])
+            writer.writerow([str(i) for i in row])
 
 
 class Study(object):
     def __init__(self, number, name):
         self.number, self.name = number, name
     def __repr__(self):
-        return u'{}(number={},name={})'.format(self.__class__.__name__, self.number, self.name)
+        return '{}(number={},name={})'.format(self.__class__.__name__, self.number, self.name)
 
 
 class Organ(object):
     def __init__(self, name, phase, studies):
         self.name, self.phase, self.studies = name, phase, studies
     def __repr__(self):
-        return u'{}(name={},phase={},studies={})'.format(self.__class__.__name__, self.name, self.phase, self.studies)
+        return '{}(name={},phase={},studies={})'.format(self.__class__.__name__, self.name, self.phase, self.studies)
 
 
 class Biomarker(object):
     def __init__(self, number, name, organs):
         self.number, self.name, self.organs = number, name, organs
     def __repr__(self):
-        return u'{}(number={},name={},organs={})'.format(self.__class__.__name__, self.number, self.name, self.organs)
+        return '{}(number={},name={},organs={})'.format(self.__class__.__name__, self.number, self.name, self.organs)
 
 
 def maureen(connection):
     cursor = connection.cursor()
+    cursor.execute("SET CHARACTER_SET_RESULTS='latin1'")
     biomarkers = {}
     cursor.execute('SELECT biomarkers.id, biomarkers.name FROM biomarkers')
     for biomarkerRow in cursor.fetchall():
         number, name = biomarkerRow[0], biomarkerRow[1]
         subcursor = connection.cursor()
+        subcursor.execute("SET CHARACTER_SET_RESULTS='latin1'")
         subcursor.execute('SELECT name from biomarker_names WHERE biomarker_id = %s and isHgnc = 1', (number,))
         if subcursor.rowcount:
             name = subcursor.fetchone()[0]
@@ -129,6 +102,7 @@ def maureen(connection):
             organNumber, organName, organPhase = organRow[0], organRow[1], organRow[2]
             studies = []
             subsubcursor = connection.cursor()
+            subsubcursor.execute("SET CHARACTER_SET_RESULTS='latin1'")
             subsubcursor.execute('''
                 SELECT
                     studies.FHCRC_ID, studies.title
@@ -146,33 +120,33 @@ def maureen(connection):
             organs.append(organ)
         biomarker = Biomarker(number, name, organs)
         biomarkers[number] = biomarker
-    with open('results.csv', 'wb') as f:
-        writer = UnicodeWriter(f)
+    with open('results.csv', 'w', newline='', encoding='utf-8') as f:
+        writer = csv.writer(f)
         biomarkerNumbers = sorted(biomarkers.keys())
         writer.writerow([
-            u'Biomarker ID Number',
-            u'HGNC name (if available)',
-            u'Organ',
-            u'Organ Phase',
-            u'Protocol ID',
-            u'Protocol Name'
+            'Biomarker ID Number',
+            'HGNC name (if available)',
+            'Organ',
+            'Organ Phase',
+            'Protocol ID',
+            'Protocol Name'
         ])
         for number in biomarkerNumbers:
             biomarker = biomarkers[number]
             for organ in biomarker.organs:
                 studies = organ.studies
                 if len(studies) == 0:
-                    writer.writerow([unicode(number), biomarker.name, organ.name, organ.phase, u'«N/A»', u'«No studies found»'])
+                    writer.writerow([str(number), biomarker.name, organ.name, organ.phase, '«N/A»', '«No studies found»'])
                 else:
                     for study in studies:
-                        writer.writerow([unicode(number), biomarker.name, organ.name, organ.phase, unicode(study.number), study.name])
+                        writer.writerow([str(number), biomarker.name, organ.name, organ.phase, str(study.number), study.name])
 
 
 def main():
     args = _argParser.parse_args()
     user = args.user
     password = args.password if args.password else getpass.getpass(u'Password for MySQL user "{}": '.format(user))
-    connection = MySQLdb.connect(host=args.host, user=user, passwd=password, db=args.database)
+    connection = pymysql.connect(host=args.host, user=user, passwd=password, db=args.database)
     # query(connection)
     maureen(connection)
     sys.exit(0)
