@@ -36,6 +36,18 @@ Installation
 Try ``pip`` or use it in a ``zc.buildout``.
 
 
+Docker
+~~~~~~
+
+Try::
+
+    docker image build --tag edrn-bmdb-rdf .
+    docker image tag edrn-bmdb-rdf:latest nutjob4life/edrn-bmdb-rdf:latest
+    docker login
+    docker image push nutjob4life/edrn-bmdb-rdf:latest
+
+
+
 Contribute
 ----------
 

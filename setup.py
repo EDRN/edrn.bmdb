@@ -38,12 +38,14 @@ setup(
         'setuptools',
         'rdflib',
         'pymysql',
+        'pyramid'
     ],
     entry_points={
         'console_scripts': [
             'generate-bmdb-rdf=edrn.bmdb.rdf:main',
             'fix-genenames-links=edrn.bmdb.genenames:main',
-            'query-into-csv=edrn.bmdb.query:main'
+            'query-into-csv=edrn.bmdb.query:main',
+            'rdf-webserver=edrn.bmdb.server:main'
         ],
     },
 )

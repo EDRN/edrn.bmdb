@@ -1,0 +1,13 @@
+# Files to not send to the Docker Daemon
+*.rdf
+*.sublime-*
+.DS_Store
+.git
+.gitignore
+bin
+develop-eggs
+docs
+parts
+**/*.py[co]
+**/*.egg-info
+**/__pycache__
