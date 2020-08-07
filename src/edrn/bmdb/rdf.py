@@ -26,7 +26,7 @@ _genBase = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#'
 # =========
 
 
-def _publications(connection, graph, public):
+def publications(connection, graph, public):
     rdfType = rdflib.URIRef(_edrnTypes.Publication)
     cursor = connection.cursor()
     cursor.execute("SET CHARACTER_SET_RESULTS='latin1'")
@@ -41,7 +41,7 @@ def _publications(connection, graph, public):
         graph.add((subject, _edrnSchema.pmid, pmid))
 
 
-def _biomarkers(connection, graph, public):
+def biomarkers(connection, graph, public):
     bioType, bsdType = rdflib.URIRef(_bmdb.Biomarker), rdflib.URIRef(_bmdb.BiomarkerStudyData)
     query = 'SELECT id, name, shortName, description, qastate, phase, security, type, isPanel, panelID, curatorNotes FROM biomarkers'
     if public:
@@ -154,7 +154,7 @@ def _biomarkers(connection, graph, public):
                     graph.add((bsdURI, _type, bsdType))
 
 
-def _organs(connection, graph, public):
+def organs(connection, graph, public):
     bmoType, bmoStudyDataType = rdflib.URIRef(_bmdb.BiomarkerOrganData), rdflib.URIRef(_bmdb.BiomarkerOrganStudyData)
     bmoCursor = connection.cursor()
     bmoCursor.execute("SET CHARACTER_SET_RESULTS='latin1'")
@@ -252,7 +252,7 @@ def _organs(connection, graph, public):
             graph.add((bmoSubject, _bmdb.referencesResource, rdflib.URIRef(i[0].strip())))
 
 
-def _resources(connection, graph, public):
+def resources(connection, graph, public):
     rdfType = rdflib.URIRef(_bmdb.ExternalResource)
     cursor = connection.cursor()
     cursor.execute("SET CHARACTER_SET_RESULTS='latin1'")
@@ -268,10 +268,10 @@ def _resources(connection, graph, public):
 
 
 _rdfFlavors = {
-    'pub': _publications,
-    'bio': _biomarkers,
-    'org': _organs,
-    'res': _resources,
+    'pub': publications,
+    'bio': biomarkers,
+    'org': organs,
+    'res': resources,
 }
 _validFlavors = ', '.join(_rdfFlavors.keys())
 
