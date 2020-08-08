@@ -38,7 +38,13 @@ class _View(object):
 
     def database(self):
         '''Tell what database connection to use for this view'''
-        return self.request.registry['database']
+        return pymysql.connect(
+            host=self.request.registry['database.host'],
+            user=self.request.registry['database.user'],
+            passwd=self.request.registry['database.passwd'],
+            db=self.request.registry['database.db'],
+            charset='utf8mb4'
+        )
 
 
 class PingView(_View):
@@ -109,13 +115,10 @@ class BiomarkerOrgansView(_RDFView):
 def main():
     '''Run a small WSGI server to serve up RDF from Focus BMDB'''
     with Configurator() as config:
-        config.registry['database'] = pymysql.connect(
-            host=os.environ.get('BMDB_HOST', 'localhost'),
-            user=os.environ.get('BMDB_USER', 'cbmdb'),
-            passwd=os.environ.get('BMDB_PASSWORD', 'cbmdb'),
-            db=os.environ.get('BMDB_DB', 'cbmdb'),
-            charset='utf8mb4'
-        )
+        config.registry['database.host'] = os.environ.get('BMDB_HOST', 'localhost')
+        config.registry['database.user'] = os.environ.get('BMDB_USER', 'cbmdb')
+        config.registry['database.passwd'] = os.environ.get('BMDB_PASSWORD', 'cbmdb')
+        config.registry['database.db'] = os.environ.get('BMDB_DB', 'cbmdb')
         config.registry['start_time'] = datetime.utcnow()
 
         config.add_route('ping', '/ping')
