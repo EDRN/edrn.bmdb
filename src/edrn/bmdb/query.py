@@ -12,6 +12,27 @@ _argParser.add_argument('-u', '--user', default='cbmdb', help='MySQL user; defau
 _argParser.add_argument('-p', '--password', help='MySQL password; will be prompted if not given')
 
 
+def datasets(connection):
+    cursor = connection.cursor()
+    cursor.execute("SET CHARACTER_SET_RESULTS='latin1'")
+    cursor.execute('''
+        SELECT
+            biomarkers.id,
+            biomarkers.name,
+            biomarker_datasets.dataset_id
+        FROM
+            biomarkers,
+            biomarker_datasets
+        WHERE
+            biomarkers.id = biomarker_datasets.biomarker_id
+    ''')
+    with open('results.csv', 'w', newline='', encoding='utf-8') as f:
+        writer = csv.writer(f)
+        writer.writerow(['biomarker id', 'biomarker name', 'dataset ID'])
+        for row in cursor.fetchall():
+            writer.writerow([str(i) for i in row])
+
+
 def query(connection):
     cursor = connection.cursor()
     cursor.execute("SET CHARACTER_SET_RESULTS='latin1'")
@@ -148,7 +169,8 @@ def main():
     password = args.password if args.password else getpass.getpass(u'Password for MySQL user "{}": '.format(user))
     connection = pymysql.connect(host=args.host, user=user, passwd=password, db=args.database)
     # query(connection)
-    maureen(connection)
+    # maureen(connection)
+    datasets(connection)
     sys.exit(0)
 
 
