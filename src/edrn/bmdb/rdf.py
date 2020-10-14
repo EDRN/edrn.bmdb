@@ -209,6 +209,8 @@ def organs(connection, graph, public):
                 graph.add((bag, rdflib.URIRef('{}_{}'.format(_genBase, li)), bosdURI))
                 # Now about that study, specifically
                 graph.add((bosdURI, _type, bmoStudyDataType))
+                studyURI = f'http://edrn.nci.nih.gov/data/protocols/{fhcrcID}'
+                graph.add((bosdURI, _bmdb.referencesStudy, rdflib.URIRef(studyURI)))
                 graph.add((bosdURI, _bmdb.DecisionRule, rdflib.Literal(decision.strip())))
                 # Sensitivity/specificity computation
                 sensSpecBag = rdflib.BNode()
