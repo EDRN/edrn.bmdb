@@ -45,7 +45,11 @@ setup(
             'generate-bmdb-rdf=edrn.bmdb.rdf:main',
             'fix-genenames-links=edrn.bmdb.genenames:main',
             'query-into-csv=edrn.bmdb.query:main',
-            'rdf-webserver=edrn.bmdb.server:main'
+            'rdf-webserver=edrn.bmdb.server:main',
+            'correlate=edrn.bmdb.correlation:main',
+            'jsongraphic=edrn.bmdb.jsongraphic:main',
+            'descreport=edrn.bmdb.descreport:main',
+            'copystudies=edrn.bmdb.copystudies:main',
         ],
     },
 )

@@ -24,7 +24,8 @@ ENV \
     BMDB_HOST=focusbmdb-db \
     BMDB_USER=cbmdb \
     BMDB_PASSWORD=cbmdb \
-    BMDB_DB=cbmdb
+    BMDB_DB=cbmdb \
+    SETUPTOOLS_VERSION=50.3.0
 
 
 # Context
@@ -53,11 +54,11 @@ COPY src/ src/
 
 RUN :\
     apk update &&\
-    apk add --virtual build-env gcc musl-dev &&\
+    apk add --quiet --virtual build-env gcc musl-dev &&\
     cd /app &&\
-    python3 bootstrap.py &&\
+    python3 bootstrap.py --setuptools-version=$SETUPTOOLS_VERSION &&\
     bin/buildout &&\
-    apk del build-env &&\
+    apk del --quiet build-env &&\
     rm -rf /var/cache/apk/* &&\
     :
 

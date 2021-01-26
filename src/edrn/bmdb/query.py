@@ -97,6 +97,11 @@ class Biomarker(object):
         return '{}(number={},name={},organs={})'.format(self.__class__.__name__, self.number, self.name, self.organs)
 
 
+class ExpandedBiomarker(Biomarker):
+    def __init__(self, number, name, hgncName, organs, members):
+        self.number, self.name, self.hgncName, self.organs, self.members = number, name, hgncName, organs, members
+
+
 def maureen(connection):
     cursor = connection.cursor()
     cursor.execute("SET CHARACTER_SET_RESULTS='latin1'")
@@ -163,14 +168,100 @@ def maureen(connection):
                         writer.writerow([str(number), biomarker.name, organ.name, organ.phase, str(study.number), study.name])
 
 
+def inventory(connection):
+    cursor = connection.cursor()
+    cursor.execute("SET CHARACTER_SET_RESULTS='latin1'")
+    biomarkers = {}
+    cursor.execute('SELECT biomarkers.id, biomarkers.name, biomarkers.isPanel FROM biomarkers')
+    for biomarkerRow in cursor.fetchall():
+        number, name, isPanel = biomarkerRow[0], biomarkerRow[1], biomarkerRow[2]
+        subcursor = connection.cursor()
+        subcursor.execute("SET CHARACTER_SET_RESULTS='latin1'")
+        subcursor.execute('SELECT name from biomarker_names WHERE biomarker_id = %s and isHgnc = 1', (number,))
+        hgncName = subcursor.fetchone()[0] if subcursor.rowcount else '«unknown»'
+
+        subcursor.execute('''
+            SELECT
+                organ_data.id, organs.name, organ_data.phase
+            FROM
+                organs, organ_data
+            WHERE
+                organs.id = organ_data.organ_id AND
+                organ_data.biomarker_id = %s
+        ''', (number,))
+        organs = []
+        for organRow in subcursor.fetchall():
+            organNumber, organName, organPhase = organRow[0], organRow[1], organRow[2]
+            studies = []
+            subsubcursor = connection.cursor()
+            subsubcursor.execute("SET CHARACTER_SET_RESULTS='latin1'")
+            subsubcursor.execute('''
+                SELECT
+                    studies.FHCRC_ID, studies.title
+                FROM
+                    studies, study_data
+                WHERE
+                    study_data.organ_data_id = %s AND
+                    studies.id = study_data.study_id
+            ''', (organNumber,))
+            for studyRow in subsubcursor.fetchall():
+                studyNumber, studyName = studyRow[0], studyRow[1]
+                study = Study(studyNumber, studyName)
+                studies.append(study)
+            organ = Organ(organName, organPhase, studies)
+            organs.append(organ)
+
+        if isPanel:
+            subcursor.execute('''
+                SELECT biomarkers.id, biomarkers.name FROM biomarkers, paneldata
+                WHERE biomarkers.id = paneldata.biomarker_id AND paneldata.panel_id = %s
+            ''', (number,))
+            members = ', '.join([f'{member[0]} ({member[1]})' for member in subcursor.fetchall()])
+        else:
+            members = ''
+
+        biomarker = ExpandedBiomarker(f'{number:05}', name, hgncName, organs, members)
+        biomarkers[f'{number:05}'] = biomarker
+
+    with open('inventory.csv', 'w', newline='', encoding='utf-8') as f:
+        writer = csv.writer(f)
+        biomarkerNumbers = sorted(biomarkers.keys())
+        writer.writerow([
+            'Biomarker Num',
+            'DB Name',
+            'HGNC name',
+            'Organ',
+            'Organ Phase',
+            'Protocol ID',
+            'Protocol Name',
+            'Panel Members'
+        ])
+        for number in biomarkerNumbers:
+            biomarker = biomarkers[number]
+            for organ in biomarker.organs:
+                studies = organ.studies
+                if len(studies) == 0:
+                    writer.writerow([
+                        biomarker.number, biomarker.name, biomarker.hgncName,
+                        organ.name, organ.phase, '«N/A»', '«No studies found»', biomarker.members
+                    ])
+                else:
+                    for study in studies:
+                        writer.writerow([
+                            biomarker.number, biomarker.name, biomarker.hgncName,
+                            organ.name, organ.phase, str(study.number), study.name, biomarker.members
+                        ])
+
+
 def main():
     args = _argParser.parse_args()
     user = args.user
     password = args.password if args.password else getpass.getpass(u'Password for MySQL user "{}": '.format(user))
-    connection = pymysql.connect(host=args.host, user=user, passwd=password, db=args.database)
+    connection = pymysql.connect(host=args.host, user=user, password=password, database=args.database)
     # query(connection)
     # maureen(connection)
-    datasets(connection)
+    # datasets(connection)
+    inventory(connection)
     sys.exit(0)
 
 
