@@ -18,7 +18,7 @@ def writeJSON(connection):
     cursor.execute('SELECT id, name FROM organs')
     for row in cursor.fetchall():
         organID, organName = row
-        organs[organName] = {'Phase 1': 0, 'Phase 2': 0, 'Phase 3': 0, 'Phase 4': 0, 'Phase 5': 0, 'Unknown': 0}
+        organs[organName] = {'Phase 1': 0, 'Phase 2': 0, 'Phase 3': 0, 'Phase 4': 0, 'Phase 5': 0}
         subcursor = connection.cursor()
         subcursor.execute("SET CHARACTER_SET_RESULTS='latin1'")
         subcursor.execute('SELECT count(phase), phase FROM organ_data WHERE organ_id = %s GROUP BY phase', (organID,))
@@ -27,7 +27,8 @@ def writeJSON(connection):
         else:
             for j in subcursor.fetchall():
                 count, phase = j
-                phase = _stupidPhasing.get(phase, 'Unknown')
+                phase = _stupidPhasing.get(phase)
+                if phase is None: continue
                 organs[organName][phase] = count
 
     for organName, phases in organs.items():
