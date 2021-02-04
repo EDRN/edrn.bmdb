@@ -21,6 +21,15 @@ _edrnSubjectBase = 'http://edrn.nci.nih.gov/data/'
 _biomarkerBase = 'http://edrn.jpl.nasa.gov/bmdb/'
 _genBase = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#'
 
+# Stupid phases
+_phases = {
+    'One': '1',
+    'Two': '2',
+    'Three': '3',
+    'Four': '4',
+    'Five': '5'
+}
+
 
 # Functions
 # =========
@@ -57,7 +66,7 @@ def biomarkers(connection, graph, public):
         urn       = rdflib.Literal('urn:edrn:bmdb:biomarker:{}'.format(dbid))
         desc      = rdflib.Literal(desc.strip())
         qaState   = rdflib.Literal(qaState)
-        phase     = rdflib.Literal(phase)
+        phase     = rdflib.Literal(_phases.get(phase.strip(), ''))
         security  = rdflib.Literal(security)
         btype     = rdflib.Literal(btype)
         shortName = rdflib.Literal(shortName.strip())
@@ -176,7 +185,7 @@ def organs(connection, graph, public):
         graph.add((bmoSubject, _bmdb.Description, rdflib.Literal(desc.strip())))
         graph.add((bmoSubject, _bmdb.PerformanceComment, rdflib.Literal(perfCom.strip())))
         graph.add((bmoSubject, _bmdb.Organ, rdflib.Literal(organName.strip())))
-        graph.add((bmoSubject, _bmdb.Phase, rdflib.Literal(phase.strip())))
+        graph.add((bmoSubject, _bmdb.Phase, rdflib.Literal(_phases.get(phase.strip(), ''))))
         graph.add((bmoSubject, _bmdb.QAState, rdflib.Literal(qastate.strip())))
 
         # Slight computation for clinical_translation
