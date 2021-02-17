@@ -168,8 +168,6 @@ def correlate(connection, danFile, maureenFile):
             if len(onlyInDump) > 0 or len(onlyInDB) > 0:
                 inDumpButDifferentPhases[dumpName] = (maureenOrgansPlusPhases, dbOrganPhases)
 
-    import pdb;pdb.set_trace()
-
     # Now the other direction
     allDBNames = set()
     cursor.execute('SELECT name, shortName FROM biomarkers')

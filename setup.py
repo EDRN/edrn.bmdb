@@ -50,6 +50,7 @@ setup(
             'jsongraphic=edrn.bmdb.jsongraphic:main',
             'descreport=edrn.bmdb.descreport:main',
             'copystudies=edrn.bmdb.copystudies:main',
+            'report34=edrn.bmdb.report34:main'
         ],
     },
 )
