@@ -206,14 +206,14 @@ def organs(connection, graph, public):
 
         # Study data; and save them up for later use
         cursor.execute(
-            'SELECT study_data.id, studies.FHCRC_ID, study_data.decision_rule FROM study_data, studies'
+            'SELECT study_data.id, studies.FHCRC_ID, study_data.decision_rule, study_data.phase FROM study_data, studies'
             ' WHERE studies.id = study_data.study_id AND study_data.organ_data_id = %s', (bmoID,)
         )
         if cursor.rowcount > 0:
             bag = rdflib.BNode()
             graph.add((bag, _type, rdflib.RDF.Bag))
             graph.add((bmoSubject, _bmdb.hasBiomarkerOrganStudyDatas, bag))
-            for li, (studyID, fhcrcID, decision) in zip(range(1, cursor.rowcount + 1), cursor.fetchall()):
+            for li, (studyID, fhcrcID, decision, studyPhase) in zip(range(1, cursor.rowcount + 1), cursor.fetchall()):
                 bosdURI = rdflib.URIRef('{}#{}'.format(bmoSubject, studyID))
                 graph.add((bag, rdflib.URIRef('{}_{}'.format(_genBase, li)), bosdURI))
                 # Now about that study, specifically
@@ -221,6 +221,7 @@ def organs(connection, graph, public):
                 studyURI = f'http://edrn.nci.nih.gov/data/protocols/{fhcrcID}'
                 graph.add((bosdURI, _bmdb.referencesStudy, rdflib.URIRef(studyURI)))
                 graph.add((bosdURI, _bmdb.DecisionRule, rdflib.Literal(decision.strip())))
+                graph.add((bosdURI, _bmdb.Phase, rdflib.Literal(_phases.get(studyPhase.strip(), ''))))
                 # Sensitivity/specificity computation
                 sensSpecBag = rdflib.BNode()
                 graph.add((sensSpecBag, _type, rdflib.RDF.Bag))
