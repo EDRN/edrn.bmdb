@@ -11,7 +11,7 @@
 #
 # This image is built on Python 3.8.5 running on Alpine Linux 3.12
 
-FROM python:3.8.5-alpine3.12
+FROM python:3.10.7-alpine3.16
 
 
 # Environment
@@ -43,7 +43,7 @@ WORKDIR /app
 # The source of this package; we could ``pip install` this but that would mean
 # having to publish this package to PyPI first and what a pain in the butt.
 
-COPY README.rst CONTRIBUTORS.rst CHANGES.rst bootstrap.py buildout.cfg setup.py ./
+COPY setup.py setup.cfg ./
 COPY src/ src/
 
 
@@ -56,10 +56,10 @@ RUN :\
     apk update &&\
     apk add --quiet --virtual build-env gcc musl-dev &&\
     cd /app &&\
-    python3 bootstrap.py --setuptools-version=$SETUPTOOLS_VERSION &&\
-    bin/buildout &&\
+    pip install --quiet . &&\
     apk del --quiet build-env &&\
     rm -rf /var/cache/apk/* &&\
+    pip uninstall --quiet --yes pip &&\
     :
 
 
@@ -84,7 +84,7 @@ HEALTHCHECK --interval=1m --timeout=5s --start-period=23s CMD nc -z -w5 127.0.0.
 #
 # It's the RDF Webserver, buh.
 
-ENTRYPOINT ["/app/bin/rdf-webserver"]
+ENTRYPOINT ["/usr/local/bin/rdf-webserver"]
 
 
 # Image Metadata

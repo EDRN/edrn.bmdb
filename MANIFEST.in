@@ -1,4 +1,2 @@
-graft src/edrnsite
-graft docs
-include *.rst
-global-exclude *.pyc
+graft src
+global-include VERSION.txt

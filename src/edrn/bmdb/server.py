@@ -80,6 +80,24 @@ class _RDFView(_View):
         return Response(body, content_type=_serializationContentTypes[serializationFormat])
 
 
+class ExampleView(_RDFView):
+    '''An RDF view for demonstration purposes.'''
+    @view_config(route_name='example')    
+    def __call__(self):
+        graph = rdflib.Graph()
+        subj1 = rdflib.URIRef('urn:example:subjects:1')
+        type_rdf = rdflib.namespace.RDF.type
+        kind = rdflib.URIRef('urn:example:types:indicator')
+        pred = rdflib.URIRef('urn:example:predicates:side')
+        graph.add((subj1, pred, rdflib.Literal('left')))
+        graph.add((subj1, type_rdf, kind))
+        if self.includePrivate():
+            subj2 = rdflib.URIRef('urn:example:subjects:2')
+            graph.add((subj2, pred, rdflib.Literal('right')))
+            graph.add((subj2, type_rdf, kind))
+        return self.serialize(graph)
+
+
 class PublicationsRDFView(_RDFView):
     '''An RDF view for publications'''
     @view_config(route_name='pub')
@@ -126,6 +144,7 @@ def main():
         config.add_route('res', '/resources')
         config.add_route('bio', '/biomarkers')
         config.add_route('bio-organ', '/biomarker-organs')
+        config.add_route('example', '/example')
 
         config.scan()
         app = config.make_wsgi_app()

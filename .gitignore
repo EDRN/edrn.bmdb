@@ -1,3 +1,5 @@
+*.sublime-workspace
+venv
 .DS_Store
 .coverage
 *.rdf
