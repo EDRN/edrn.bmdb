@@ -40,3 +40,5 @@ report.html
 !.gitkeep
 !.travis.yml
 !src/edrn
+*.zip
+*.csv
