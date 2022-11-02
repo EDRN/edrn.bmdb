@@ -4,7 +4,7 @@
         {
             "path": ".",
             "folder_exclude_patterns": ["bin", "dep-src", "develop-eggs", "dist", "build", "*.egg-info", "parts", "var", "__pycache__"],
-            "file_exclude_patterns": [".*.cfg", "bootstrap.py", "doc.txt", "*.sublime-*"]
+            "file_exclude_patterns": [".*.cfg", "bootstrap.py", "doc.txt", "*.sublime-*", "*.csv", "*.zip"]
         }
 	]
 }
