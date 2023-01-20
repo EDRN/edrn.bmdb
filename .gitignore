@@ -1,4 +1,5 @@
 *.sublime-workspace
+.venv
 venv
 .DS_Store
 .coverage
@@ -42,3 +43,4 @@ report.html
 !src/edrn
 *.zip
 *.csv
+*.bz2

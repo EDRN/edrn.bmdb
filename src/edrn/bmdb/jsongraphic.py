@@ -36,7 +36,7 @@ def writeJSON(connection):
         c = phases['Phase 4'] = phases['Phase 4'] + c
         c = phases['Phase 3'] = phases['Phase 3'] + c
         c = phases['Phase 2'] = phases['Phase 2'] + c
-        phases['Phase 1'] = phases['Phase 2'] + c
+        phases['Phase 1'] = phases['Phase 1'] + c
 
     json.dump(organs, sys.stdout)
 
