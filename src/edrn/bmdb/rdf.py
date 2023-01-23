@@ -21,7 +21,7 @@ _edrnSubjectBase = 'http://edrn.nci.nih.gov/data/'
 _biomarkerBase = 'http://edrn.jpl.nasa.gov/bmdb/'
 _genBase = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#'
 
-# Stupid phases
+# Phases
 _phases = {
     'One': '1',
     'Two': '2',

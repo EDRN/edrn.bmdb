@@ -4,7 +4,7 @@ from functools import total_ordering
 import pymysql, argparse, getpass, sys, csv
 
 
-_stupidPhasing = {
+_phasing = {
     'One': 1,
     'Two': 2,
     'Three': 3,
@@ -162,7 +162,7 @@ def correlate(connection, danFile, maureenFile):
             ''', (number,))
             dbOrganPhases = set()
             for row in subcursor.fetchall():
-                organ, phase = row[0].strip().lower(), _stupidPhasing.get(row[1], '«no phase»')
+                organ, phase = row[0].strip().lower(), _phasing.get(row[1], '«no phase»')
                 dbOrganPhases.add((organ, phase))
             onlyInDump, onlyInDB = maureenOrgansPlusPhases - dbOrganPhases, dbOrgans - maureenOrgansPlusPhases
             if len(onlyInDump) > 0 or len(onlyInDB) > 0:

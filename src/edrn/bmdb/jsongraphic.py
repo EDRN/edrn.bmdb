@@ -2,7 +2,7 @@
 
 import pymysql, argparse, getpass, sys, json
 
-_stupidPhasing = {
+_phasing = {
     'One': 'Phase 1',
     'Two': 'Phase 2',
     'Three': 'Phase 3',
@@ -27,7 +27,7 @@ def writeJSON(connection):
         else:
             for j in subcursor.fetchall():
                 count, phase = j
-                phase = _stupidPhasing.get(phase)
+                phase = _phasing.get(phase)
                 if phase is None: continue
                 organs[organName][phase] = count
 
