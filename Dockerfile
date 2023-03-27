@@ -8,10 +8,8 @@
 
 # Base Image
 # ----------
-#
-# This image is built on Python 3.8.5 running on Alpine Linux 3.12
 
-FROM python:3.10.7-alpine3.16
+FROM python:3.10.10-alpine3.16
 
 
 # Environment
