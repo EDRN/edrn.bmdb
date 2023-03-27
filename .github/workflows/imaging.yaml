@@ -52,7 +52,7 @@ jobs:
                 with:
                     platforms: linux/amd64,linux/arm64
                     push: true
-                    tags: ${{secrets.DOCKERHUB_USERNAME}}/edrn-bmdb:latest
+                    tags: ${{secrets.DOCKERHUB_USERNAME}}/edrn-bmdb-rdf:latest
 
 ...
 
