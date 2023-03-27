@@ -8,13 +8,7 @@ from pyramid.config import Configurator
 from pyramid.response import Response
 from pyramid.view import view_config
 from wsgiref.simple_server import make_server
-import os, pymysql, rdflib
-
-
-# If the ``all`` parameter is one of these values, include *all* entities, not
-# just hte public ones.
-
-_truthiness = ('yep', 'yeah', 'right', 'uh-huh')
+import os, pymysql, rdflib, sys
 
 
 # Map from an RDF serialization format to a corresponding MIME content type
@@ -68,7 +62,7 @@ class _RDFView(_View):
 
     def includePrivate(self):
         '''Return true if the request for this view wants *all* entities or False if just the public ones'''
-        return self.request.params.get('all') in _truthiness
+        return self.request.params.get('all') == os.getenv('TOKEN')
 
     def serialize(self, graph):
         '''Serialize the given RDF ``graph`` into an HTTP response'''
@@ -132,6 +126,14 @@ class BiomarkerOrgansView(_RDFView):
 
 def main():
     '''Run a small WSGI server to serve up RDF from Focus BMDB'''
+
+    if not os.getenv('TOKEN'):
+        print(
+            'The TOKEN environment variable must be set to the security token to reveal private information',
+            file=sys.stderr
+        )
+        sys.exit(-1)
+
     with Configurator() as config:
         config.registry['database.host'] = os.environ.get('BMDB_HOST', 'localhost')
         config.registry['database.user'] = os.environ.get('BMDB_USER', 'cbmdb')
