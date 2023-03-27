@@ -85,7 +85,7 @@ class ExampleView(_RDFView):
         pred = rdflib.URIRef('urn:example:predicates:side')
         graph.add((subj1, pred, rdflib.Literal('left')))
         graph.add((subj1, type_rdf, kind))
-        if self.includePrivate():
+        if self.request.params.get('all') == 'right':
             subj2 = rdflib.URIRef('urn:example:subjects:2')
             graph.add((subj2, pred, rdflib.Literal('right')))
             graph.add((subj2, type_rdf, kind))
