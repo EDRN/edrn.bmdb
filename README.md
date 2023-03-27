@@ -32,15 +32,7 @@ Try `pip` or use Docker.
 
 ### Docker
 
-
-Try:
-
-    docker image build --tag edrn-bmdb-rdf .
-    docker image tag edrn-bmdb-rdf:latest nutjob4life/edrn-bmdb-rdf:latest
-    docker login
-    docker image push nutjob4life/edrn-bmdb-rdf:latest
-
-Also maybe tag a version too and update `VERSION.txt`.
+Now handled by the imaging workflow of GitHub Actions.
 
 
 ## Handy Focus BMDB Tables in MySQL

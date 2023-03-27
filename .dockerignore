@@ -8,6 +8,6 @@ bin
 develop-eggs
 docs
 parts
-**/*.py[co]
+**/*.py[cod]
 **/*.egg-info
 **/__pycache__
