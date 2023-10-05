@@ -246,7 +246,7 @@ def organs(connection, graph, public):
                 for i in c.fetchall():
                     pubURI = rdflib.URIRef('{}publications/view/{}'.format(_biomarkerBase, i[0]))
                     graph.add((bosdURI, _bmdb.referencedInPublication, pubURI))
-                c .execute(
+                c.execute(
                     'SELECT URL FROM biomarker_study_data_resources WHERE biomarker_study_data_id = %s', ((studyID,))
                 )
                 for i in c.fetchall():
@@ -320,4 +320,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
