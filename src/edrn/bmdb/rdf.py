@@ -52,14 +52,14 @@ def publications(connection, graph, public):
 
 def biomarkers(connection, graph, public):
     bioType, bsdType = rdflib.URIRef(_bmdb.Biomarker), rdflib.URIRef(_bmdb.BiomarkerStudyData)
-    query = 'SELECT id, name, shortName, description, qastate, phase, security, type, isPanel, panelID, curatorNotes FROM biomarkers'
+    query = 'SELECT id, shortName, description, qastate, phase, security, type, isPanel, panelID, curatorNotes FROM biomarkers'
     if public:
         query += " WHERE qastate != 'Under Review'"
     biocursor = connection.cursor()
     biocursor.execute("SET CHARACTER_SET_RESULTS='latin1'")
     biocursor.execute(query)
     # TODO: get created & modified datetimes?
-    for dbid, name, shortName, desc, qaState, phase, security, btype, isPanel, panelID, curatorNotes in biocursor.fetchall():
+    for dbid, shortName, desc, qaState, phase, security, btype, isPanel, panelID, curatorNotes in biocursor.fetchall():
         isPublicBiomaker = qaState == 'Accepted'
 
         subject   = rdflib.URIRef('{}biomarkers/view/{}'.format(_biomarkerBase, dbid))

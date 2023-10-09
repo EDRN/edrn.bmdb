@@ -62,7 +62,9 @@ class _RDFView(_View):
 
     def includePrivate(self):
         '''Return true if the request for this view wants *all* entities or False if just the public ones'''
-        return self.request.params.get('all') == os.getenv('TOKEN')
+        supplied, expected = self.request.params.get('all'), os.getenv('TOKEN')
+        rc = supplied == expected
+        return rc
 
     def serialize(self, graph):
         '''Serialize the given RDF ``graph`` into an HTTP response'''
