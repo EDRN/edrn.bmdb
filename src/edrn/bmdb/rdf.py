@@ -52,14 +52,14 @@ def publications(connection, graph, public):
 
 def biomarkers(connection, graph, public):
     bioType, bsdType = rdflib.URIRef(_bmdb.Biomarker), rdflib.URIRef(_bmdb.BiomarkerStudyData)
-    query = 'SELECT id, shortName, description, qastate, phase, security, type, isPanel, panelID, curatorNotes FROM biomarkers'
+    query = 'SELECT id, description, qastate, phase, security, type, isPanel, panelID, curatorNotes FROM biomarkers'
     if public:
         query += " WHERE qastate != 'Under Review'"
     biocursor = connection.cursor()
     biocursor.execute("SET CHARACTER_SET_RESULTS='latin1'")
     biocursor.execute(query)
     # TODO: get created & modified datetimes?
-    for dbid, shortName, desc, qaState, phase, security, btype, isPanel, panelID, curatorNotes in biocursor.fetchall():
+    for dbid, desc, qaState, phase, security, btype, isPanel, panelID, curatorNotes in biocursor.fetchall():
         isPublicBiomaker = qaState == 'Accepted'
 
         subject   = rdflib.URIRef('{}biomarkers/view/{}'.format(_biomarkerBase, dbid))
@@ -69,7 +69,6 @@ def biomarkers(connection, graph, public):
         phase     = rdflib.Literal(_phases.get(phase.strip(), ''))
         security  = rdflib.Literal(security)
         btype     = rdflib.Literal(btype)
-        shortName = rdflib.Literal(shortName.strip())
         isPanel   = bool(isPanel)
 
         # OK, let's go
@@ -95,7 +94,6 @@ def biomarkers(connection, graph, public):
         graph.add((subject, _bmdb.Phase, phase))
         graph.add((subject, _bmdb.Security, security))
         graph.add((subject, _bmdb.Type, btype))
-        graph.add((subject, _bmdb.ShortName, shortName))
 
         # If it's a panel, show its composition
         if isPanel:
