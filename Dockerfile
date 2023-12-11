@@ -52,7 +52,7 @@ COPY src/ src/
 
 RUN :\
     apk update &&\
-    apk add --quiet --virtual build-env gcc musl-dev &&\
+    apk add --quiet --virtual build-env gcc musl-dev libffi-dev &&\
     cd /app &&\
     pip install --quiet . &&\
     apk del --quiet build-env &&\
