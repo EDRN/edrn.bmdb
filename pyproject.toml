@@ -1,3 +1,48 @@
-[build-system]
-requires = ['setuptools', 'wheel']
-build-backend = 'setuptools.build_meta'
+[project]
+name = 'edrn.bmdb'
+authors = [
+    {name = 'Sean Kelly', email = 'kelly@seankelly.biz'}
+]
+description = 'Biomarker Database utilities and RDF server for Early Detection Research Network'
+license = {file = 'LICENSE.txt'}
+readme = 'README.md'
+keywords = ['cancer', 'portal', 'data', 'rdf']
+dynamic = ['version']
+requires-python = '>=3.9,<3.12'
+dependencies = [
+    'rdflib ~= 7.0.0',
+    'pymysql ~= 1.0.2',
+    'pyramid ~= 2.0',
+    'cryptography ~= 41.0.7'
+]
+
+[project.urls]
+Homepage = 'https://github.com/EDRN/edrn.bmdb'
+Issues = 'https://github.com/EDRN/edrn.bmdb/issues'
+
+[project.scripts]
+generate-bmdb-rdf   = 'edrn.bmdb.rdf:main'
+fix-genenames-links = 'edrn.bmdb.genenames:main'
+query-into-csv      = 'edrn.bmdb.query:main'
+rdf-webserver       = 'edrn.bmdb.server:main'
+correlate           = 'edrn.bmdb.correlation:main'
+jsongraphic         = 'edrn.bmdb.jsongraphic:main'
+descreport          = 'edrn.bmdb.descreport:main'
+copystudies         = 'edrn.bmdb.copystudies:main'
+report34            = 'edrn.bmdb.report34:main'
+report50            = 'edrn.bmdb.report50:main'
+report51            = 'edrn.bmdb.report51:main'
+report52            = 'edrn.bmdb.report52:main'
+zombie              = 'edrn.bmdb.maureen_zombie_report:main'
+kristen             = 'edrn.bmdb.kristen_report:main'
+rdfcompare          = 'edrn.bmdb.compare:main'
+organ-specifics     = 'edrn.bmdb.organ_specifics:main'
+overtime            = 'edrn.bmdb.overtime:main'
+rdf_convertrer      = 'edrn.bmdb.rdf_converter:main'
+
+[tool.hatch.version]
+path = 'src/jpl/labcas/utils/VERSION.txt'
+pattern = '(?P<version>.+)'
+
+[tool.hatch.build.targets.wheel]
+packages = ['src/jpl']
