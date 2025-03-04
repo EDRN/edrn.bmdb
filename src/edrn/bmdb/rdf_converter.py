@@ -1,11 +1,9 @@
 # encoding: utf-8
 
-import argparse
-import csv
-import json
-import sys
-import logging
+import argparse, csv, sys, logging
 from rdflib import Graph, URIRef
+from collections import defaultdict
+from urllib.parse import urlparse
 
 logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
 
@@ -17,27 +15,18 @@ def load_rdf_data():
     # Define the RDF data sources
     urls = [
         'https://bmdb.jpl.nasa.gov/rdf/biomarkers',
-        'https://bmdb.jpl.nasa.gov/rdf/biomarker-organs'
+        # 'https://bmdb.jpl.nasa.gov/rdf/biomarker-organs'
+        # ‼️ for local testing and speed
+        # 'file:/tmp/bio.rdf',  # 'file:/tmp/bio-org.rdf'
     ]
     
     # Load RDF data from each source
     for url in urls:
-        logging.info(f'Loading RDF data from {url}…')
+        logging.info('Loading RDF data from %s', url)
         g.parse(url, format='xml')  # Assuming RDF/XML format
     
     logging.info(f'Loaded {len(g)} triples into the RDF graph.')
     return g
-
-
-def filter_triples_by_predicates(graph, predicate_short_names, predicate_map):
-    filtered_triples = []
-    for name in predicate_short_names:
-        if name not in predicate_map:
-            logging.warning('Ignoring unknown short name %s', name)
-            continue
-        predicate_uri = predicate_map[name]
-        filtered_triples.extend([(s, p, o) for s, p, o in graph if p == predicate_uri])
-    return filtered_triples
 
 
 def get_predicate_map(graph):
@@ -49,32 +38,40 @@ def get_predicate_map(graph):
     return predicate_map
 
 
-def write_output(statements, output_format):
-    if output_format == 'csv':
-        writer = csv.writer(sys.stdout)
-        writer.writerow(['Subject', 'Predicate', 'Object'])
-        writer.writerows(statements)
-    elif output_format == 'json':
-        json.dump([{'subject': str(s), 'predicate': str(p), 'object': str(o)} for s, p, o in statements], sys.stdout, indent=4)
-        sys.stdout.write('\n')
+def short_predicate(uri):
+    return urlparse(uri).fragment
+
+
+def write_output(statements, predicate_map):
+    writer = csv.writer(sys.stdout)
+    header = [key for key in predicate_map.keys() if not key.startswith('_')]
+    writer.writerow(['ID'] + header)
+
+    biomarkers = defaultdict(list)
+    for s, p, o in statements:
+        if '/view/' in str(s):
+            biomarkers[s].append((p, o))
+
+    for biomarker, predicates in biomarkers.items():
+        values = defaultdict(list)
+        for predicate in predicates:
+            short, value = short_predicate(predicate[0]), predicate[1]
+            position = header.index(short)
+            values[position].append(value)
+        row = [biomarker]
+        for i in range(len(values)):
+            row.append('|'.join(values[i]))
+        writer.writerow(row)
 
 
 def main():
-    parser = argparse.ArgumentParser(description='Load RDF data and filter by predicate.')
-    parser.add_argument('predicate', type=str, nargs='*', help='Filter statements by this predicate short name.')
-    parser.add_argument('--output', type=str, choices=['csv', 'json'], default='csv', help='Output format: csv or json (default: csv).')
-    args = parser.parse_args()
+    parser = argparse.ArgumentParser(description='Convert RDF data to CSV')
+    _ = parser.parse_args()
     
     rdf_graph = load_rdf_data()
     predicate_map = get_predicate_map(rdf_graph)
     
-    filtered_statements = filter_triples_by_predicates(rdf_graph, args.predicate, predicate_map)
-    if args.output:
-        write_output(filtered_statements, args.output)
-    else:
-        logging.info(f'Filtered Statements for predicate {args.predicate}:')
-        for stmt in filtered_statements:
-            logging.info(stmt)
+    write_output(rdf_graph, predicate_map)
 
 
 if __name__ == '__main__':
