@@ -39,6 +39,8 @@ rdfcompare          = 'edrn.bmdb.compare:main'
 organ-specifics     = 'edrn.bmdb.organ_specifics:main'
 overtime            = 'edrn.bmdb.overtime:main'
 rdf_convertrer      = 'edrn.bmdb.rdf_converter:main'
+english             = 'edrn.bmdb.english:main'
+
 
 [tool.hatch.version]
 path = 'src/jpl/labcas/utils/VERSION.txt'
