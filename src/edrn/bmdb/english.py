@@ -32,10 +32,10 @@ def load_rdf_knowledge():
     
     # RDF data sources for BMDB
     urls = [
-        # 'https://bmdb.jpl.nasa.gov/rdf/biomarkers',
+        'https://bmdb.jpl.nasa.gov/rdf/biomarkers',
         # 'https://bmdb.jpl.nasa.gov/rdf/biomarker-organs'
         # ‼️ for local testing and speed
-        'file:/tmp/bio.rdf',  # 'file:/tmp/bio-org.rdf'
+        # 'file:/tmp/bio.rdf',  # 'file:/tmp/bio-org.rdf'
     ]
     
     # Load RDF data from each source
